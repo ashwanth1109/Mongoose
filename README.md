@@ -158,3 +158,11 @@ To connect to more than one database at the same time, we need to use the mongoo
 const mongoURI = "mongodb://localhost:27017/" + "databaseName";
 const databaseConnection = mongoose.createConnection(mongoURI);
 ```
+
+The mongoURI string can use multiple options and some common ones are -
+
+1. setting different ports:
+   "mongodb://localhost:27018/databaseName"
+
+2. accessing the database as a specific user:
+   "mongodb://username:password@localhost/databaseName"
