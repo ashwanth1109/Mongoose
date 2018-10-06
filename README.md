@@ -512,4 +512,4 @@ Earlier, we had seen that a sample data entity in the document created from our 
 }
 ```
 
-In this entity, we did not set **v and **id. **id is a unique identifier that is assigned by Mongo and **v is an internal versioning number set by Mongoose when a document is created. It doesn't increment when the document is changed, but instead keeps track of when arrays within documents have changed their indexed positions for some entries. The \_\_v gives you a way to check if the array has changed, when you're trying to access any element using its position or index in the array.
+In this entity, we did not set \_\_v and \_\_id. \_\_id is a unique identifier that is assigned by Mongo and \_\_v is an internal versioning number set by Mongoose when a document is created. It doesn't increment when the document is changed, but instead keeps track of when arrays within documents have changed their indexed positions for some entries. The \_\_v gives you a way to check if the array has changed, when you're trying to access any element using its position or index in the array.
