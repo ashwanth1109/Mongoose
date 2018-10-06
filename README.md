@@ -170,3 +170,53 @@ The mongoURI string can use multiple options and some common ones are -
 
 2. accessing the database as a specific user:
    "mongodb://username:password@localhost/databaseName"
+
+#### Connection Options
+
+Mongoose allows you to pass certain options as an optional second paramenter in the form of a JSON object. For example,
+
+```javascript
+const mongoURI = "mongodb://localhost:27017/databaseName";
+const dbOptions = { user: "db_username", pass: "db_password" };
+mongoose.connect(
+  mongoURI,
+  dbOptions
+);
+```
+
+Options that you can use this way are - user, pass, db, server, repiset
+
+#### Closing the Connection
+
+Each mongoose connection has a close() method that takes an optional callback function.
+
+If you are using the default connection you call it as follows:
+
+```javascript
+const db = mongoose.connection;
+db.close(() => {
+  console.log(`Mongoose default connection closed`);
+});
+```
+
+To close a named connection:
+
+```javascript
+adminConnection.close(() => {
+  console.log(`Mongoose admin connection closed`);
+});
+```
+
+#### [REVIEW]
+
+Closing when the node process ends:
+As a rule of thumb, you should close any connections on process termination using the following snippet of code:
+
+```javascript
+process.on(`SIGINT`, () => {
+  db.close(() => {
+    console.log(`Mongoose disconnected due to app termination`);
+    process.exit(0);
+  });
+});
+```
