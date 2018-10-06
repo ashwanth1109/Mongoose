@@ -220,3 +220,76 @@ process.on(`SIGINT`, () => {
   });
 });
 ```
+
+#### Connection Events
+
+The connection process in Mongoose inherits the Node 'EventEmitter' class - which means that we can run certain code on certain events occurring - e.g. connected, disconnected, error etc.
+
+```javascript
+db.on(`error`, () => {
+  console.log(`Mongoose connection error: ${err}`);
+});
+```
+
+Similarly, we can write such blocks of code for disconnected & connected states.
+
+### Setup Code
+
+In models/db.js
+
+```javascript
+//------------------------------------------------------------------------------------
+// CREATE A FILE CALLED db.js & store it in models
+//------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------
+// Import in the mongoose module
+//------------------------------------------------------------------------------------
+const mongoose = require("mongoose");
+
+//------------------------------------------------------------------------------------
+// Build the connection string
+//------------------------------------------------------------------------------------
+const mongoURI = "mongodb://localhost/MongoosePM";
+
+//------------------------------------------------------------------------------------
+// Create the database connection
+//------------------------------------------------------------------------------------
+mongoose.connect(mongoURI);
+
+//------------------------------------------------------------------------------------
+// Store mongoose.connection in db for ease of use
+//------------------------------------------------------------------------------------
+const db = mongoose.connection;
+
+//------------------------------------------------------------------------------------
+// Set error state on db
+//------------------------------------------------------------------------------------
+db.on("error", () => {
+  console.log(`Mongoose connection error: ${err}`);
+});
+
+//------------------------------------------------------------------------------------
+// Set connected state on db
+//------------------------------------------------------------------------------------
+db.on("connected", () => {
+  console.log(`Mongoose connected to ${mongoURI}`);
+});
+
+//------------------------------------------------------------------------------------
+// Set disconnected state on db
+//------------------------------------------------------------------------------------
+db.on("disconnected", () => {
+  console.log(`Mongoose disconnected`);
+});
+
+//------------------------------------------------------------------------------------
+// Catch if node process is ending & close connection
+//------------------------------------------------------------------------------------
+process.on("SIGINT", () => {
+  db.close(() => {
+    console.log(`Mongoose disconnected through app termination`);
+    process.exit(0);
+  });
+});
+```
