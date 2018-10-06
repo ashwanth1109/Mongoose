@@ -233,7 +233,7 @@ db.on(`error`, () => {
 
 Similarly, we can write such blocks of code for disconnected & connected states.
 
-### Setup Code
+### Full Setup Code
 
 In models/db.js
 
@@ -293,3 +293,14 @@ process.on("SIGINT", () => {
   });
 });
 ```
+
+Next, we open the connecion on starting the application:
+
+In app.js,
+
+```javascript
+const express = require("express");
+const db = require(`./models/db`);
+```
+
+Now we have finished setup and can move on to defining our schemas and models.
