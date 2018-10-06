@@ -423,3 +423,93 @@ You must keep in mind that Mongoose does not automatically detect any changes ma
 ##### Custom SchemaTypes
 
 You can also define custom SchemaTypes using Mongoose plugins for data types such as long, double, RegEx, email etc.
+
+#### Defining Schemas
+
+1. Create a variable and assign a Mongoose schema object to this variable.
+
+```javascript
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const userSchema = new Schema({});
+```
+
+2. Now we can add basic value types for the different fields.
+   We can use fields like createdOn, modifiedOn and lastLogin to keep track of useful information
+
+```javascript
+const userSchema = Schema({
+  name: String,
+  email: String,
+  createdOn: Date
+  modifiedOn: Date,
+  lastLogin: Date
+});
+```
+
+3. We can also set a default value
+
+```javascript
+const userSchema = Schema({
+  createdOn: Date
+});
+```
+
+is short for
+
+```javascript
+const userSchema = Schema({
+  createdOn: { type: Date }
+});
+```
+
+We can add more properties to this object:
+
+```javascript
+const userSchema = Schema(
+  {
+    createdOn: { type: Date, default: Date.now }
+  },
+  { timestamps: true }
+);
+```
+
+To use Date.now, we need to add a timestamp to the controller function. 'default' is a reserved work in Javascript, and although reserved words can be used as keys, it is a safer option to wrap them in quotes like follows:
+
+```javascript
+const userSchema = Schema(
+  {
+    createdOn: { type: Date, default: Date.now }
+  },
+  { timestamps: true }
+);
+```
+
+4. To ensure that there are no duplicate entries, we can set unique as true as follows:
+
+```javascript
+const userSchema = Schema({
+  email: { type: String, unique: true }
+});
+```
+
+This ensures that MongoDB will check if email already exists in the database and throws an errow if it does.
+
+Earlier, we had seen that a sample data entity in the document created from our user schema looks like the following:
+
+```javascript
+{
+  "__v": 0,
+  "__id": ObjectId("12595135c000148e6d7e3e00"),
+  "createdOn": ISODate("2018-09-23T10:32:14.543Z"),
+  "name": "Ashwanth",
+  "email": "example@email.com",
+  "gender": "m",
+  "mobile": "9999999999",
+  "location": "Bangalore",
+  "joinDate": ISODate("2018-09-23T10:32:14.543Z"),
+  "friends": 0
+}
+```
+
+In this entity, we did not set **v and **id. **id is a unique identifier that is assigned by Mongo and **v is an internal versioning number set by Mongoose when a document is created. It doesn't increment when the document is changed, but instead keeps track of when arrays within documents have changed their indexed positions for some entries. The \_\_v gives you a way to check if the array has changed, when you're trying to access any element using its position or index in the array.
