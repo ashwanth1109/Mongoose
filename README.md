@@ -63,57 +63,7 @@ Express lets you create a server in a much simpler way by taking care of all of 
 
 ### Mongoose
 
-Mongoose is an object modelling tool for Node.js and can be installed as an npm package to leverage the powerful functionality of Node.js. Using Mongoose, you can define your data structure in JSON inside your project.
-
-To define your database structure you create schemas using Mongoose in the following manner -
-
-```javascript
-const mongoose = require(`mongoose`);
-const Schema = mongoose.Schema;
-
-const userSchema = new Schema(
-  {
-    name: { type: String, required: true, unique: true },
-    email: { type: String, required: true },
-    gender: String,
-    mobile: Number,
-    location: String,
-    joinDate: { type: Date, default: Date.now },
-    friends: { type: String, min: 0 }
-  },
-  { timestamps: true }
-);
-```
-
-A schema is an object that defines the structure of any documents that will be stored in your MongoDB collection and it lets you define the data types and provides options for setting default values, validations etc.
-
-We use models (basically another object) to access a named collection and query that collection. A model is created by combining a Schema, a Connection and a collection name and can be exported as follows -
-
-```javascript
-module.exports = mongoose.model("User", userSchema);
-```
-
-You can read more about this at -
-https://www.mongodb.com/blog/post/the-mean-stack-mistakes-youre-probably-making
-
-A model can be thought of as a compiled version of the schema and each instance of the model will map to one document in the database.
-
-A document in MongoDB created from this schema would look like the following code snippet -
-
-```javascript
-{
-  "__v": 0,
-  "__id": ObjectId("12595135c000148e6d7e3e00"),
-  "createdOn": ISODate("2018-09-23T10:32:14.543Z"),
-  "name": "Ashwanth",
-  "email": "example@email.com",
-  "gender": "m",
-  "mobile": "9999999999",
-  "location": "Bangalore",
-  "joinDate": ISODate("2018-09-23T10:32:14.543Z"),
-  "friends": 0
-}
-```
+Mongoose is an object modelling tool for Node.js and can be installed as an npm package to leverage the powerful functionality of Node.js. Using Mongoose, you can define your data structure in JSON inside your project using schemas and models.
 
 Mongoose makes it easier to interact with your data by defining the schema for it and interacting with MongoDB in a consistent & predictable manner. It handles some layers of complexity involved with certain queries which can have multi-nested callbacks to interact with the MongoDB driver.
 Unlike MongoDB which returns a JSON string on querying, Mongoose returns the data as a JSON object. It also has a plethora of helpler functions and methods that make things more convenient.
@@ -304,3 +254,172 @@ const db = require(`./models/db`);
 ```
 
 Now we have finished setup and can move on to defining our schemas and models.
+
+### Schemas & Models
+
+These are building blocks of Mongoose.
+To put it simply, a schema is a way to describe the structure of your data by labeling the data and defining what its data type is.
+
+To define your database structure you create schemas using Mongoose in the following manner -
+
+```javascript
+const mongoose = require(`mongoose`);
+const Schema = mongoose.Schema;
+
+const userSchema = new Schema(
+  {
+    name: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
+    gender: String,
+    mobile: Number,
+    location: String,
+    joinDate: { type: Date, default: Date.now },
+    friends: { type: String, min: 0 }
+  },
+  { timestamps: true }
+);
+```
+
+A schema is an object that defines the structure of any documents that will be stored in your MongoDB collection and it lets you define the data types and provides options for setting default values, validations etc.
+
+We use models (basically another object) to access a named collection and query that collection. A model is created by combining a Schema, a Connection and a collection name and can be exported as follows -
+
+```javascript
+module.exports = mongoose.model("User", userSchema);
+```
+
+You can read more about this at -
+https://www.mongodb.com/blog/post/the-mean-stack-mistakes-youre-probably-making
+
+A model can be thought of as a compiled version of the schema and each instance of the model will map to one document in the database.
+
+A document in MongoDB created from this schema would look like the following code snippet -
+
+```javascript
+{
+  "__v": 0,
+  "__id": ObjectId("12595135c000148e6d7e3e00"),
+  "createdOn": ISODate("2018-09-23T10:32:14.543Z"),
+  "name": "Ashwanth",
+  "email": "example@email.com",
+  "gender": "m",
+  "mobile": "9999999999",
+  "location": "Bangalore",
+  "joinDate": ISODate("2018-09-23T10:32:14.543Z"),
+  "friends": 0
+}
+```
+
+MongoDB imposes a maximum document size of 16MB and to work around this limit, we have to use the MongoDB GridFS API.
+
+#### Data Types in Schemas
+
+There are 8 data types that you can set in the schema -
+
+1. String
+2. Number
+3. Date
+4. Boolean
+5. Buffer
+6. ObjectId
+7. Mixed
+8. Array
+
+##### String
+
+The String SchemaType stores a string value, UTF-8 encoded.
+
+##### Number
+
+The Number SchemaType stores a number value with restrictions, Mongoose does not natively support long and double datatypes, even though MongoDB does. We can extend Mongoose's functionality to support it using some plugins.
+
+##### Date
+
+The Date SchemaType holds a date and time obkect, which is returned from MongoDB as an ISO Date Object.
+
+##### Boolean
+
+The Boolean SchemaType holds one of two values - true or false
+
+##### Buffer
+
+The Buffer SchemaType stores binary information, e.g. images
+
+##### ObjectId
+
+The ObjectId SchemaType can be used to assign a custom id rather than using \_id and must be defined as follows -
+
+```javascript
+userSchema.add({
+  userId: Schema.Types.ObjectId
+});
+```
+
+##### Mixed
+
+The Mixed SchemaType defines that the value entered in that field can be of any type. It can be set in one of two ways as follows:
+
+```javascript
+const userSchema = new Schema({
+  mixedData: {}
+});
+```
+
+```javascript
+const userSchema = new Schema({
+  mixedData: Schema.Types.Mixed
+});
+```
+
+There is a gotcha when using mixed however. Any changes made to mixed data type cannot be automatically detected by Mongoose, so it wont know to save them. Thus, you have to manually declare that the data has changed using the markModified method as follows:
+
+```javascript
+user.mixedData = { someValue: "value has been changed" };
+user.markModified("mixedData");
+user.save();
+```
+
+##### Array
+
+The Array datatype can be used in two ways. First, a simple array of values:
+
+```javascript
+const userSchema = new Schema({
+  emailAddresses: [String]
+});
+```
+
+The Array datatype can also be used to store a collection using nested schemas as follows:
+
+```javascript
+const emailSchema = new Schema({
+  email: String,
+  verified: Boolean
+});
+const userSchema = new Schema({
+  name: String,
+  emailAddresses: [emailSchema]
+});
+```
+
+You can also define a mixed type in your array as follows:
+
+```javascript
+const emailSchema = new Schema({
+  addresses: []
+});
+```
+
+(or)
+
+```javascript
+const emailSchema = new Schema({
+  addresses: Array
+});
+```
+
+You must keep in mind that Mongoose does not automatically detect any changes made to the mixed data type.
+
+##### Custom SchemaTypes
+
+You can also define custom SchemaTypes using Mongoose plugins for data types such as long, double, RegEx, email etc.
