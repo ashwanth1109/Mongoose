@@ -513,3 +513,114 @@ Earlier, we had seen that a sample data entity in the document created from our 
 ```
 
 In this entity, we did not set \_\_v and \_\_id. \_\_id is a unique identifier that is assigned by Mongo and \_\_v is an internal versioning number set by Mongoose when a document is created. It doesn't increment when the document is changed, but instead keeps track of when arrays within documents have changed their indexed positions for some entries. The \_\_v gives you a way to check if the array has changed, when you're trying to access any element using its position or index in the array.
+
+#### Creating Models
+
+A model is a named compiled version of the schema and each instance of the model maps to a single document in our database. The model allows for operations such as creating, reading, saving and deleting to manipulate the data.
+
+We can build a model from our user schema on a default connection, we do it as follows:
+
+```javascript
+mongoose.model("User", userSchema);
+```
+
+If we are creating a model based on a named Mongoose connection, we can do it as follows:
+
+```javascript
+adminConnection.model("User", userSchema);
+```
+
+We can create multiple instances from our model as follows:
+
+```javascript
+const user1 = new User({ name: "Ashwanth" });
+const user2 = new User({ name: "Niko" });
+```
+
+We can access properties of these instances in the same way as we do with any regular database.
+
+```javascript
+console.log(user1.name); // Ashwanth
+user1.name = "Dorotheos";
+console.log(user1.name); // Dorotheos
+```
+
+We can save each of these instances to the database as follows:
+
+```javascript
+user1.save(err => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("User 1 is saved to database");
+  }
+});
+```
+
+##### Find one instance from model
+
+To find one specific instance of the model, we can use the findOne query in Mongoose:
+
+```javascript
+User.findOne({ name: "Ashwanth" }, (err, user) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(user);
+  }
+});
+```
+
+##### Find all instances in model
+
+To find all instances in model, we use the find query:
+
+```javascript
+User.find({}, (err, users) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(users);
+  }
+});
+```
+
+##### Model Name & MongoDB Collection
+
+The name of the MongoDB collection will by default be a lowercase pluralized version of the model name.
+
+```javascript
+mongoose.model("User", userSchema);
+```
+
+This model will reference a collection called 'users' in MongoDB.
+
+##### Overriding the collection name
+
+You can choose not to go with the default collection name by specifying a different collection name either in the schema declaration or in the model command.
+
+We can specify the collection name in the schema as follows:
+
+```javascript
+const userSchema = new Schema(
+  {
+    name: String,
+    email: String
+  },
+  { collection: "collectionName" }
+);
+```
+
+We can specify the collection name in the model as follows:
+
+```javascript
+mongoose.model("User", userSchema, "collectionName");
+```
+
+To completely define the schema and models, we need to ensure that the following steps are completed:
+
+1. Require mongoose
+2. Set the connection string for the MongoDB database
+3. Define all the necessary schema
+4. Build all the necessary models
+5. Open the mongoose connection to the database
