@@ -1,7 +1,7 @@
 # MONGOOSE & MONGO DB
 
 This repo is meant to be a resource for me (and hopefully others) for developing in Mongoose.
-As I was learning the stack, I found it difficult to understand the stack and I wanted to create notes to refer to while working with Mongoose & Mongo DB. For beginners, I strongly recommend reading the book 'Mongoose for Application Development' by Simon Holmes [Packt Publishing]. That was one of the few books I managed to find that went into great detail about using Mongoose. Since it was released in 2013, Im hoping to update some of the outdated information from the book and publish them here based on the Mongoose API documentation. If any information is inaccurate or you would like to contribute some content, feel free to raise an issue and we can integrate content using pull requests.
+As I was learning the stack, I found it difficult to understand the stack and I wanted to create notes to refer to while working with Mongoose & Mongo DB. For beginners, I strongly recommend reading the book 'Mongoose for Application Development' by Simon Holmes [Packt Publishing]. That was one of the few books I managed to find that went into great detail about using Mongoose and this is the book that Im making these notes from (for non commercial purposes). Since it was released in 2013, Im hoping to update some of the outdated information from the book and publish them here based on the Mongoose API documentation. If any information is inaccurate or you would like to contribute some content, feel free to raise an issue and we can integrate content using pull requests.
 
 ### The Technology Stack - Node.js, npm, MongoDB, and Express
 
@@ -92,6 +92,8 @@ module.exports = mongoose.model("User", userSchema);
 You can read more about this at -
 https://www.mongodb.com/blog/post/the-mean-stack-mistakes-youre-probably-making
 
+A model can be thought of as a compiled version of the schema and each instance of the model will map to one document in the database.
+
 A document in MongoDB created from this schema would look like the following code snippet -
 
 ```javascript
@@ -107,4 +109,52 @@ A document in MongoDB created from this schema would look like the following cod
   "joinDate": ISODate("2018-09-23T10:32:14.543Z"),
   "friends": 0
 }
+```
+
+Mongoose makes it easier to interact with your data by defining the schema for it and interacting with MongoDB in a consistent & predictable manner. It handles some layers of complexity involved with certain queries which can have multi-nested callbacks to interact with the MongoDB driver.
+Unlike MongoDB which returns a JSON string on querying, Mongoose returns the data as a JSON object. It also has a plethora of helpler functions and methods that make things more convenient.
+
+### Installations
+
+Once you have Node and MongoDB installed, we want to install initialize a project with
+
+```
+npm init -y
+```
+
+To install dependencies (express and mongoose) -
+
+```
+npm i express mongoose
+```
+
+##### [REVIEW]
+
+Author uses jade dependency as well. Research on this.
+
+### Establishing a database connection
+
+There are two ways to connect to databases -
+
+1. mongoose.connect
+2. mongoose.createConnection
+
+#### mongoose.connect
+
+To set up a default connection, we use the mongoose.connect method as follows -
+
+```javascript
+const mongoURI = "mongodb://localhost:27017/" + "databaseName";
+mongoose.connect(mongoURI);
+```
+
+This opens a mongoose connection to the Mongo database that is running on the localhost. As long as you require Mongoose, we can use this connection anywhere in the app.
+
+#### mongoose.createConnection
+
+To connect to more than one database at the same time, we need to use the mongoose.createConnection method as follows -
+
+```javascript
+const mongoURI = "mongodb://localhost:27017/" + "databaseName";
+const databaseConnection = mongoose.createConnection(mongoURI);
 ```
