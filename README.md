@@ -3,7 +3,7 @@
 This repo is meant to be a resource for me (and hopefully others) while developing in Mongoose.
 As I was learning this stack, I found it difficult to understand the stack and I wanted to create some form of notes to refer to when working with Mongoose & Mongo DB.
 
-I strongly recommend reading the book 'Mongoose for Application Development' by Simon Holmes [Packt Publishing]. This was one of the few books I found, that provides a very good introduction to Mongoose and this is the book has been one of the primary references for these notes (meant for non commercial purposes only; no copyright infringement intended). Since it was released in 2013, Im hoping to update some of the outdated information from the book and publish them here based on the Mongoose API documentation and my personal learnings from attending the General Assembly Web Development Immersive Bootcamp.
+I strongly recommend reading the book 'Mongoose for Application Development' by Simon Holmes [Packt Publishing]. This was one of the few books I found, that provides a very good introduction to Mongoose and this book has been the primary reference for my notes (meant for non commercial purposes only; no copyright infringement intended). Since it was released in 2013, Im hoping to update some of the outdated information from the book and publish them here based on the Mongoose API documentation and my personal learnings from attending the General Assembly Web Development Immersive Bootcamp.
 
 If any information is inaccurate or you would like to contribute some content, feel free to raise an issue and we can integrate content using pull requests.
 
@@ -284,8 +284,9 @@ Now we have finished setup and can move on to defining our schemas and models.
 
 ### Schemas & Models
 
-These are building blocks of Mongoose.
+These are building blocks of Mongoose. Everything in Mongoose starts with a Schema.
 To put it simply, a schema is a way to describe the structure of your data by labeling the data and defining what its data type is.
+Each schema maps to a MongoDB collection and is responsible for what the documents in that collection look like.
 
 To define your database structure you create schemas using Mongoose in the following manner -
 
@@ -301,13 +302,19 @@ const userSchema = new Schema(
     mobile: Number,
     location: String,
     joinDate: { type: Date, default: Date.now },
-    friends: { type: String, min: 0 }
+    friends: { type: String, min: 0 },
+    tweets: [{ body: String, date: Date }],
+    hidden: Boolean,
+    meta: {
+      votes: Number,
+      favs: Number
+    }
   },
   { timestamps: true }
 );
 ```
 
-A schema is an object that defines the structure of any documents that will be stored in your MongoDB collection and it lets you define the data types and provides options for setting default values, validations etc. Nexdt we compile our schema into a model.
+A schema is an object that defines the structure of any documents that will be stored in your MongoDB collection and it lets you define the data types and provides options for setting default values, validations etc. Next, we compile our schema into a model.
 
 A model is a class with which we construct our documents.
 We use models to access a named collection and query that collection. A model is created by combining a Schema, a Connection and a collection name and can be exported as follows -
@@ -539,6 +546,12 @@ const userSchema = Schema(
   },
   { timestamps: true }
 );
+```
+
+To add additional keys, we can also use the Schema.add method:
+
+```javascript
+userSchema.add({ name: "string", color: "string", price: "number" });
 ```
 
 To use Date.now, we need to add a timestamp to the controller function. 'default' is a reserved work in Javascript, and although reserved words can be used as keys, it is a safer option to wrap them in quotes like follows:
