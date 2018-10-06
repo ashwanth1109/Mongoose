@@ -624,3 +624,13 @@ To completely define the schema and models, we need to ensure that the following
 3. Define all the necessary schema
 4. Build all the necessary models
 5. Open the mongoose connection to the database
+
+So far, we have merely begun to explore all the possibilities and functionality that models provide us.
+
+#### CRUD operations - Introduction
+
+To reiterate a document is a single instance of a model. So, in order to operate on a document, we need to work with the provided methods of the model. Some examples of these methods are - create, find, update, remove etc. These methods are usually applied to the model, however we also have instance methods that let us apply certain methods on individual instances of the model - e.g. instance.save method.
+
+Mongoose also let you create your own model methods, thus providing you with the functionality necessary to create any kind of method.
+
+In order to further explore the methods available to use, we will continue with the 'User' model compiled from the 'userSchema'
