@@ -3,7 +3,7 @@
 This repo is meant to be a resource for me (and hopefully others) while developing in Mongoose.
 As I was learning this stack, I found it difficult to understand the stack and I wanted to create some form of notes to refer to when working with Mongoose & Mongo DB.
 
-I strongly recommend reading the book 'Mongoose for Application Development' by Simon Holmes [Packt Publishing]. This was one of the few books I found, that went into great detail about Mongoose and this is the book that Im making these notes from (for non commercial purposes; no copyright infringement intended). Since it was released in 2013, Im hoping to update some of the outdated information from the book and publish them here based on the Mongoose API documentation and my personal learnings over the past few days.
+I strongly recommend reading the book 'Mongoose for Application Development' by Simon Holmes [Packt Publishing]. This was one of the few books I found, that provides a very good introduction to Mongoose and this is the book has been one of the primary references for these notes (meant for non commercial purposes only; no copyright infringement intended). Since it was released in 2013, Im hoping to update some of the outdated information from the book and publish them here based on the Mongoose API documentation and my personal learnings from attending the General Assembly Web Development Immersive Bootcamp.
 
 If any information is inaccurate or you would like to contribute some content, feel free to raise an issue and we can integrate content using pull requests.
 
@@ -26,7 +26,7 @@ In traditional stacks, on getting the request, we first take the data, write it 
 
 This problem is solved in Node.js by using callbacks to run the tasks for you.
 
-Consider the following hello world example,
+Consider the following hello world express example,
 
 ```javascript
 const express = require("express");
@@ -82,9 +82,9 @@ To install dependencies (express and mongoose) -
 npm i express mongoose
 ```
 
-##### [REVIEW]
+### [Add steps to setup basic express server]
 
-Author uses jade dependency as well. Research on this.
+To get started we need to require mongoose and then establish a database connection.
 
 ### Establishing a database connection
 
@@ -98,6 +98,7 @@ There are two ways to connect to databases -
 To set up a default connection, we use the mongoose.connect method as follows -
 
 ```javascript
+const mongoose = require("mongoose");
 const mongoURI = "mongodb://localhost:27017/" + "databaseName";
 mongoose.connect(mongoURI);
 ```
@@ -109,6 +110,7 @@ This opens a mongoose connection to the Mongo database that is running on the lo
 To connect to more than one database at the same time, we need to use the mongoose.createConnection method as follows -
 
 ```javascript
+const mongoose = require("mongoose");
 const mongoURI = "mongodb://localhost:27017/" + "databaseName";
 const databaseConnection = mongoose.createConnection(mongoURI);
 ```
@@ -152,8 +154,8 @@ db.close(() => {
 To close a named connection:
 
 ```javascript
-adminConnection.close(() => {
-  console.log(`Mongoose admin connection closed`);
+databaseConnection.close(() => {
+  console.log(`Mongoose database connection closed`);
 });
 ```
 
@@ -175,13 +177,38 @@ process.on(`SIGINT`, () => {
 
 The connection process in Mongoose inherits the Node 'EventEmitter' class - which means that we can run certain code on certain events occurring - e.g. connected, disconnected, error etc.
 
+Error:
+
 ```javascript
 db.on(`error`, () => {
   console.log(`Mongoose connection error: ${err}`);
 });
 ```
 
-Similarly, we can write such blocks of code for disconnected & connected states.
+Connected:
+
+```javascript
+db.on("connected", () => {
+  console.log("Mongoose connected succesfully");
+});
+```
+
+Disconnected:
+
+```javascript
+db.on("disconnected", () => {
+  console.log("Mongoose disconnected succesfully");
+});
+```
+
+Alternatively, we can run the following code snippet for the same purpose:
+
+```javascript
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+  console.log("Mongoose connection established succesfully");
+});
+```
 
 ### Full Setup Code
 
@@ -244,7 +271,7 @@ process.on("SIGINT", () => {
 });
 ```
 
-Next, we open the connecion on starting the application:
+Next, we open the connecion on starting the application in app.js:
 
 In app.js,
 
@@ -280,9 +307,10 @@ const userSchema = new Schema(
 );
 ```
 
-A schema is an object that defines the structure of any documents that will be stored in your MongoDB collection and it lets you define the data types and provides options for setting default values, validations etc.
+A schema is an object that defines the structure of any documents that will be stored in your MongoDB collection and it lets you define the data types and provides options for setting default values, validations etc. Nexdt we compile our schema into a model.
 
-We use models (basically another object) to access a named collection and query that collection. A model is created by combining a Schema, a Connection and a collection name and can be exported as follows -
+A model is a class with which we construct our documents.
+We use models to access a named collection and query that collection. A model is created by combining a Schema, a Connection and a collection name and can be exported as follows -
 
 ```javascript
 module.exports = mongoose.model("User", userSchema);
@@ -311,6 +339,45 @@ A document in MongoDB created from this schema would look like the following cod
 ```
 
 MongoDB imposes a maximum document size of 16MB and to work around this limit, we have to use the MongoDB GridFS API.
+
+To create instances of our model, we create them just as we do with regular classes:
+
+```javascript
+const user1 = new User({ name: "Ashwanth" });
+console.log(user1.name); // 'Ashwanth'
+```
+
+Models can also have methods defined in them if we have explicitly added these functions to the methods property of a schema before compiling it with mongoose.model():
+
+```javascript
+userSchema.methods.generateGreeting = () => {
+  const greeting = this.name
+    ? `Hello, I am ${this.name}`
+    : `Sorry, name not defined`;
+  return greeting;
+};
+
+const User = mongoose.model("User", userSchema);
+```
+
+These functions that are added to the methods property of a schema gets compiled into the Model prototype and can be exposed on each document instance as follows:
+
+```javascript
+const user1 = new User({ name: "Ashwanth" });
+console.log(user1.generateGreeting());
+```
+
+Although we have a user, we still haven't saved it to the database. To do that, we need to call the save method on the instance as follows:
+
+```javascript
+user1.save((err, user) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(user);
+  }
+});
+```
 
 #### Data Types in Schemas
 
@@ -527,7 +594,7 @@ mongoose.model("User", userSchema);
 If we are creating a model based on a named Mongoose connection, we can do it as follows:
 
 ```javascript
-adminConnection.model("User", userSchema);
+databaseConnection.model("User", userSchema);
 ```
 
 We can create multiple instances from our model as follows:
@@ -633,4 +700,4 @@ To reiterate a document is a single instance of a model. So, in order to operate
 
 Mongoose also let you create your own model methods, thus providing you with the functionality necessary to create any kind of method.
 
-In order to further explore the methods available to use, we will continue with the 'User' model compiled from the 'userSchema'
+In order to further explore the methods available to use, we will continue with the 'User' model compiled from the 'userSchema'.
