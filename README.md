@@ -56,3 +56,55 @@ https://www.mongodb.com/blog/post/thinking-documents-part-1?jmp=docs&_ga=2.20216
 Express is a web application framework for Node. In a Node project, there is a lot of groundwork to be done to even create a basic web server and you have to serve static files in a non-blocking way, amongst a few other things to take care of.
 
 Express lets you create a server in a much simpler way by taking care of all of this setup for you and is a great starting point for creating your application.
+
+### Mongoose
+
+Mongoose is an object modelling tool for Node.js and can be installed as an npm package to leverage the powerful functionality of Node.js. Using Mongoose, you can define your data structure in JSON inside your project.
+
+To define your database structure you create schemas using Mongoose in the following manner -
+
+```javascript
+const mongoose = require(`mongoose`);
+const Schema = mongoose.Schema;
+
+const userSchema = new Schema(
+  {
+    name: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
+    gender: String,
+    mobile: Number,
+    location: String,
+    joinDate: { type: Date, default: Date.now },
+    friends: { type: String, min: 0 }
+  },
+  { timestamps: true }
+);
+```
+
+A schema is an object that defines the structure of any documents that will be stored in your MongoDB collection and it lets you define the data types and provides options for setting default values, validations etc.
+
+We use models (basically another object) to access a named collection and query that collection. A model is created by combining a Schema, a Connection and a collection name and can be exported as follows -
+
+```javascript
+module.exports = mongoose.model("User", userSchema);
+```
+
+You can read more about this at -
+https://www.mongodb.com/blog/post/the-mean-stack-mistakes-youre-probably-making
+
+A document in MongoDB created from this schema would look like the following code snippet -
+
+```javascript
+{
+  "__v": 0,
+  "__id": ObjectId("12595135c000148e6d7e3e00"),
+  "createdOn": ISODate("2018-09-23T10:32:14.543Z"),
+  "name": "Ashwanth",
+  "email": "example@email.com",
+  "gender": "m",
+  "mobile": "9999999999",
+  "location": "Bangalore",
+  "joinDate": ISODate("2018-09-23T10:32:14.543Z"),
+  "friends": 0
+}
+```
