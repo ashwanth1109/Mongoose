@@ -714,3 +714,84 @@ To reiterate a document is a single instance of a model. So, in order to operate
 Mongoose also let you create your own model methods, thus providing you with the functionality necessary to create any kind of method.
 
 In order to further explore the methods available to use, we will continue with the 'User' model compiled from the 'userSchema'.
+
+#### CRUD - CREATE
+
+To use our database in any way at all, we must first create the data inside it. This is done by first creating an instance of the model and adding the necessary data to that instance.
+
+Since our model is called User, we can create an instance like so:
+
+```javascript
+const user1 = new User({
+  name: "Ashwanth",
+  email: "example@email.com"
+});
+```
+
+To save our new user, we can use the save() method.
+
+```javascript
+user1.save((err, user) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(user);
+  }
+});
+```
+
+You can add or modify data to this instance after creating it.
+
+```javascript
+user1.gender = "m";
+```
+
+We can also chain this creation into one line as follows:
+
+```javascript
+const user1 = new User({
+  name: "Ashwanth"
+}).save((err) {
+  if (!err) {
+    console.log('user saved successfully');
+  }
+});
+```
+
+This process of creating users is simplified further when using the create method to save the database entry in a single step.
+
+We create users using the create() method or the insertMany() method depending on whether we want to insert data in small or large batches.
+
+```javascript
+// Blueprint: ModelName.create(dataObject, callback)
+User.create({ name: "Ashwanth" }, (err, data) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(data);
+  }
+});
+```
+
+```javascript
+const users = [
+  {
+    name: "Ashwanth"
+  },
+  {
+    name: "Niko"
+  },
+  {
+    name: "Doro"
+  }
+];
+User.insertMany(users, (err, data) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(data);
+  }
+});
+```
+
+Although the create and insertMany are the easier way of doing things, we may be sometimes required to use the new and save approach if you need to modify the instance after creation and before saving.
